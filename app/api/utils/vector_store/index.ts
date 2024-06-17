@@ -3,6 +3,9 @@ import { loadPineconeStore } from './pinecone';
 // import { loadMongoDBStore } from './mongo';
 import { Callbacks } from '@langchain/core/callbacks/manager';
 
+
+// need to figure out what chatId does
+
 export async function loadVectorStore({
   namespace,
   embeddings,
@@ -31,7 +34,7 @@ export async function loadRetriever({
   chatId,
   callbacks,
 }: {
-  // namespace: string;
+  namespace: string;
   embeddings: Embeddings;
   chatId: string;
   callbacks?: Callbacks;

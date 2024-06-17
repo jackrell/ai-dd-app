@@ -23,6 +23,7 @@
     "postgres": "^3.4.4",
     "react": "^18",
     "react-dom": "^18",
+    "react-pdf-viewer": "^0.1.0",
     "react-uploader": "^3.43.0",
     "uploader": "^3.48.3",
     "vercel": "^34.2.7"
