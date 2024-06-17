@@ -14,6 +14,7 @@
     "@langchain/pinecone": "^0.0.7",
     "@pinecone-database/pinecone": "^2.2.2",
     "axios": "^1.7.2",
+    "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
     "formidable": "^3.5.1",
     "next": "14.2.4",
@@ -21,6 +22,8 @@
     "postgres": "^3.4.4",
     "react": "^18",
     "react-dom": "^18",
+    "react-uploader": "^3.43.0",
+    "uploader": "^3.48.3",
     "vercel": "^34.2.7"
   },
   "devDependencies": {
@@ -31,6 +34,7 @@
     "eslint-config-next": "14.2.4",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "prisma": "^5.15.0"
   }
 }
