@@ -3,7 +3,7 @@
 import { UploadDropzone } from 'react-uploader';
 import { Uploader } from 'uploader';
 import { useRouter } from 'next/navigation';
-// import DocIcon from '@/components/ui/DocIcon';
+// import DocIcon from '@/components/ui/DocIcon'; NEED TO FIX THIS
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
 
@@ -52,7 +52,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
   );
 
   async function ingestPdfs(documents: { fileUrl: string, fileName: string }[]) {
-    let res = await fetch('/api/ingestPDF', {
+    let res = await fetch('../api/ingestPDF', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
   return (
     <div className="mx-auto flex flex-col gap-4 container mt-10">
       <h1 className="text-4xl leading-[1.1] tracking-tighter font-medium text-center">
-        Chat With Your Datarooms
+        Chat With Your Dataroom
       </h1>
       {foldersList.length > 0 && (
         <div className="flex flex-col gap-4 mx-10 my-5">
@@ -84,7 +84,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
                   onClick={() => router.push(`/folder/${folder.name}`)}
                   className="flex gap-4"
                 >
-                  <DocIcon />
+                  {/* <DocIcon /> */}
                   <span>{folder.name}</span>
                 </button>
                 <span>{formatDistanceToNow(new Date(folder.createdAt))} ago</span>
