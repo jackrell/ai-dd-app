@@ -1,3 +1,6 @@
+import React from "react";
+import { ClerkProvider } from "@clerk/nextjs";
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
@@ -16,7 +19,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <ClerkProvider>
       <body className={`${inter.className} antialiased`}>{children}</body>
+      </ClerkProvider>
     </html>
   );
 }
