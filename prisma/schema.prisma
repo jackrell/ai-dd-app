@@ -13,5 +13,6 @@ model Document {
     userId    String
     fileUrl   String
     fileName  String
+    namespace String  // Added field for folder namespace
     createdAt DateTime @default(now()) @map(name: "created_at")
 }

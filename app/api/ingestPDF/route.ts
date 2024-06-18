@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
 import prisma from '@/utils/prisma';
-//import { getAuth } from '@clerk/nextjs/server';
+import { getAuth } from '@clerk/nextjs/server';
 import { loadEmbeddingsModel } from '../utils/embeddings';
 import { loadVectorStore } from '../utils/vector_store';
 
@@ -14,11 +14,11 @@ export async function POST(request: Request) {
   // Each document should have fileUrl and fileName
 
   // comment back in for authentication
-//   const { userId } = getAuth(request as any);
+   const { userId } = getAuth(request as any);
 
-//   if (!userId) {
-//     return NextResponse.json({ error: 'You must be logged in to ingest data' });
-//   }
+   if (!userId) {
+    return NextResponse.json({ error: 'You must be logged in to ingest data' });
+   }
 
   const namespace = folderName;
 

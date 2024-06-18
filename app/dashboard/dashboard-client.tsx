@@ -3,7 +3,7 @@
 import { UploadDropzone } from 'react-uploader';
 import { Uploader } from 'uploader';
 import { useRouter } from 'next/navigation';
-// import DocIcon from '@/components/ui/DocIcon'; NEED TO FIX THIS
+// import DocIcon from '@/components/ui/DocIcon'; NEED TO get doc image
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
 
@@ -52,7 +52,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
   );
 
   async function ingestPdfs(documents: { fileUrl: string, fileName: string }[]) {
-    let res = await fetch('../api/ingestPDF', {
+    let res = await fetch('/api/ingestPDF', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
