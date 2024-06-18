@@ -93,7 +93,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
                   onClick={() => router.push(`/folder/${folder.namespace}`)}
                   className="flex gap-4"
                 >
-                  <DocIcon />
+                  {/* <DocIcon /> */}
                   <span>{folder.namespace}</span>
                 </button>
                 <span>
