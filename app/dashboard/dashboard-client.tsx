@@ -77,17 +77,17 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
           <div className="flex flex-col shadow-sm border divide-y-2 sm:min-w-[650px] mx-auto">
             {foldersList.map((folder: any) => (
               <div
-                key={folder.name}
+                key={folder.namespace}
                 className="flex justify-between p-3 hover:bg-gray-100 transition sm:flex-row flex-col sm:gap-0 gap-3"
               >
                 <button
-                  onClick={() => router.push(`/folder/${folder.name}`)}
+                  onClick={() => router.push(`/folder/${folder.namespace}`)}
                   className="flex gap-4"
                 >
                   {/* <DocIcon /> */}
-                  <span>{folder.name}</span>
+                  <span>{folder.namespace}</span>
                 </button>
-                <span>{formatDistanceToNow(new Date(folder.createdAt))} ago</span>
+                <span>{formatDistanceToNow(new Date(folder._min.createdAt))} ago</span>
               </div>
             ))}
           </div>
