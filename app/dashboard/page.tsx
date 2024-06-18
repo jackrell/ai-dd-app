@@ -10,7 +10,7 @@ export default async function Page() {
   const foldersList = await prisma.document.groupBy({
     by: ['namespace'],
     where: {
-      userId: user?.id,
+      userId: user?.id, // change to allow everyone to access docs
     },
     _min: {
       createdAt: true,

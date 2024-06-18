@@ -7,7 +7,7 @@ import { loadEmbeddingsModel } from '../utils/embeddings';
 import { loadVectorStore } from '../utils/vector_store';
 
 
-// need to add in a folderName with the JSON somehow? and make sure documents is an array?
+// need to add in a folderName with the JSON somehow? and make sure documents are an array?
 
 export async function POST(request: Request) {
   const { documents, folderName } = await request.json();
@@ -23,8 +23,11 @@ export async function POST(request: Request) {
   const namespace = folderName;
 
   const results = [];
+
+  console.log(`Starting ingestion for folder: ${folderName}`);
   
   for (const { fileUrl, fileName } of documents) {
+    console.log(`Processing file: ${fileName}`);
     try {
       const doc = await prisma.document.create({
         data: {
@@ -35,11 +38,15 @@ export async function POST(request: Request) {
         },
       });
 
+      console.log(`Created document record for: ${fileName}`);
+
       /* load from remote pdf URL */
       const response = await fetch(fileUrl);
       const buffer = await response.blob();
       const loader = new PDFLoader(buffer);
       const rawDocs = await loader.load();
+
+      console.log(`Loaded PDF: ${fileName}`);
 
       /* Split text into chunks */
       const textSplitter = new RecursiveCharacterTextSplitter({
@@ -47,6 +54,8 @@ export async function POST(request: Request) {
         chunkOverlap: 200,
       });
       const splitDocs = await textSplitter.splitDocuments(rawDocs);
+
+      console.log(`Split document into chunks: ${fileName}`);
 
       console.log('creating vector store...');
 
@@ -65,10 +74,12 @@ export async function POST(request: Request) {
       results.push({ success: true, fileName, id: doc.id });
 
     } catch (error) {
-      console.log('error', error);
+      console.error(`Error processing file ${fileName}:`, error);
       results.push({ success: false, fileName, error: 'Failed to ingest your data' });
     }
   }
+
+  console.log(`Finished ingestion for folder: ${folderName}`);
 
   return NextResponse.json({
     results,

@@ -9,15 +9,14 @@ import { useState } from 'react';
 
 // Configuration for the uploader
 const uploader = Uploader({
-  apiKey: !!process.env.NEXT_PUBLIC_BYTESCALE_API_KEY
-    ? process.env.NEXT_PUBLIC_BYTESCALE_API_KEY
-    : 'no api key found',
+  apiKey: process.env.NEXT_PUBLIC_BYTESCALE_API_KEY || 'no api key found',
 });
 
 export default function DashboardClient({ foldersList }: { foldersList: any }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [folderName, setFolderName] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   const options = {
     maxFileCount: 15, // Allow multiple files
@@ -36,14 +35,8 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
       uploader={uploader}
       options={options}
       onUpdate={(files) => {
-        if (files.length !== 0) {
-          setLoading(true);
-          ingestPdfs(
-            files.map((file) => ({
-              fileUrl: file.fileUrl,
-              fileName: file.originalFile.originalFileName || file.filePath,
-            }))
-          );
+        if (files.length > 0) {
+          setSelectedFiles(files);
         }
       }}
       width="470px"
@@ -52,25 +45,41 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
   );
 
   async function ingestPdfs(documents: { fileUrl: string, fileName: string }[]) {
-    let res = await fetch('/api/ingestPDF', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        documents,
-        folderName,
-      }),
-    });
+    setLoading(true);
 
-    let data = await res.json();
-    router.push(`/folder/${folderName}`);
+    try {
+      const documents = selectedFiles.map((file) => ({
+        fileUrl: file.fileUrl,
+        fileName: file.originalFile.originalFileName || file.filePath,
+      }));
+
+      console.log('Ingesting PDFs:', documents);
+
+      let res = await fetch('/api/ingestPDF', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          documents,
+          folderName,
+        }),
+      });
+
+      let data = await res.json();
+      setLoading(false);
+      router.push(`/folder/${folderName}`);
+
+    } catch (error) {
+      console.error('Error during ingestion:', error);
+      setLoading(false);
+    }
   }
 
-  return (
+ return (
     <div className="mx-auto flex flex-col gap-4 container mt-10">
       <h1 className="text-4xl leading-[1.1] tracking-tighter font-medium text-center">
-        Chat With Your Dataroom
+        Chat With Your PDFs
       </h1>
       {foldersList.length > 0 && (
         <div className="flex flex-col gap-4 mx-10 my-5">
@@ -84,10 +93,12 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
                   onClick={() => router.push(`/folder/${folder.namespace}`)}
                   className="flex gap-4"
                 >
-                  {/* <DocIcon /> */}
+                  <DocIcon />
                   <span>{folder.namespace}</span>
                 </button>
-                <span>{formatDistanceToNow(new Date(folder._min.createdAt))} ago</span>
+                <span>
+                  {formatDistanceToNow(new Date(folder._min.createdAt))} ago
+                </span>
               </div>
             ))}
           </div>
@@ -102,8 +113,25 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
           No folders found. Upload new PDFs below!
         </h2>
       )}
-      <div className="mx-auto min-w-[450px] flex justify-center">
-        {loading ? (
+      <div className="mx-auto min-w-[450px] flex flex-col justify-center items-center">
+        <input
+          type="text"
+          placeholder="Folder Name"
+          value={folderName}
+          onChange={(e) => setFolderName(e.target.value)}
+          className="mb-4"
+          required
+        />
+        <UploadDropZone />
+        {selectedFiles.length > 0 && (
+          <button
+            onClick={ingestPdfs}
+            className="mt-4 px-4 py-2 font-semibold leading-6 text-lg shadow rounded-md text-black transition ease-in-out duration-150 bg-blue-500 hover:bg-blue-600 text-white"
+          >
+            Finish and Ingest PDFs
+          </button>
+        )}
+        {loading && (
           <button
             type="button"
             className="inline-flex items-center mt-4 px-4 py-2 font-semibold leading-6 text-lg shadow rounded-md text-black transition ease-in-out duration-150 cursor-not-allowed"
@@ -130,18 +158,6 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
             </svg>
             Ingesting your PDFs...
           </button>
-        ) : (
-          <div>
-            <input
-              type="text"
-              placeholder="Folder Name"
-              value={folderName}
-              onChange={(e) => setFolderName(e.target.value)}
-              className="mb-4"
-              required
-            />
-            <UploadDropZone />
-          </div>
         )}
       </div>
     </div>
