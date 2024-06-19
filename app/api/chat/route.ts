@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { Message as VercelChatMessage } from 'ai';
 import { createRAGChain } from '@/utils/ragChain';
-import type { Document } from '@langchain/core/documents';
 import { HumanMessage, AIMessage, ChatMessage } from '@langchain/core/messages';
 import { ChatTogetherAI } from '@langchain/community/chat_models/togetherai';
 import { loadRetriever } from '../utils/vector_store';
 import { loadEmbeddingsModel } from '../utils/embeddings';
 
-// need to alter further so that it works with the frontend (folderName passed as namespace)
-
-export const runtime = 'edge';
+export const runtime =
+  process.env.NEXT_PUBLIC_VECTORSTORE === 'mongodb' ? 'nodejs' : 'edge';
 
 const formatVercelMessages = (message: VercelChatMessage) => {
   if (message.role === 'user') {
@@ -17,7 +15,9 @@ const formatVercelMessages = (message: VercelChatMessage) => {
   } else if (message.role === 'assistant') {
     return new AIMessage(message.content);
   } else {
-    console.warn(`Unknown message type passed: "${message.role}". Falling back to generic message type.`);
+    console.warn(
+      `Unknown message type passed: "${message.role}". Falling back to generic message type.`,
+    );
     return new ChatMessage({ content: message.content, role: message.role });
   }
 };
@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
     if (!messages.length) {
       throw new Error('No messages provided.');
     }
+
     const formattedPreviousMessages = messages.slice(0, -1).map(formatVercelMessages);
     const currentMessageContent = messages[messages.length - 1].content;
     const folderName = body.folderName;

@@ -76,7 +76,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
     }
   }
 
- return (
+  return (
     <div className="mx-auto flex flex-col gap-4 container mt-10">
       <h1 className="text-4xl leading-[1.1] tracking-tighter font-medium text-center">
         Chat With Your PDFs
