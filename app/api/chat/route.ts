@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { Message as VercelChatMessage } from 'ai';
 import { createRAGChain } from '@/utils/ragChain';
+
 import { HumanMessage, AIMessage, ChatMessage } from '@langchain/core/messages';
 import { ChatTogetherAI } from '@langchain/community/chat_models/togetherai';
 import { loadRetriever } from '../utils/vector_store';
@@ -29,7 +30,6 @@ export async function POST(req: NextRequest) {
     if (!messages.length) {
       throw new Error('No messages provided.');
     }
-
     const formattedPreviousMessages = messages.slice(0, -1).map(formatVercelMessages);
     const currentMessageContent = messages[messages.length - 1].content;
     const folderName = body.folderName;
@@ -41,8 +41,8 @@ export async function POST(req: NextRequest) {
 
     const embeddings = loadEmbeddingsModel();
 
-    let resolveWithDocuments: (value: Document[]) => void;
-    const documentPromise = new Promise<Document[]>((resolve) => {
+    let resolveWithDocuments: (value: any[]) => void;
+    const documentPromise = new Promise<any[]>((resolve) => {
       resolveWithDocuments = resolve;
     });
 

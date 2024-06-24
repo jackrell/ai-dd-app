@@ -28,6 +28,7 @@ export async function POST(request: Request) {
   
   for (const { fileUrl, fileName } of documents) {
     console.log(`Processing file: ${fileName}`);
+
     try {
       const doc = await prisma.document.create({
         data: {
@@ -42,8 +43,9 @@ export async function POST(request: Request) {
 
       /* load from remote pdf URL */
       const response = await fetch(fileUrl);
-      const buffer = await response.blob();
-      const loader = new PDFLoader(buffer);
+      const arrayBuffer = await response.arrayBuffer();
+      const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+      const loader = new PDFLoader(blob);
       const rawDocs = await loader.load();
 
       console.log(`Loaded PDF: ${fileName}`);
@@ -54,6 +56,11 @@ export async function POST(request: Request) {
         chunkOverlap: 200,
       });
       const splitDocs = await textSplitter.splitDocuments(rawDocs);
+
+      /* adding fileName to document metadata */
+      splitDocs.forEach((splitDoc) => {
+        splitDoc.metadata.fileName = fileName;
+      });
 
       console.log(`Split document into chunks: ${fileName}`);
 

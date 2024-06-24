@@ -15,6 +15,11 @@ import { toolbarPlugin } from '@react-pdf-viewer/toolbar';
 import { pageNavigationPlugin } from '@react-pdf-viewer/page-navigation';
 import Toggle from '@/components/ui/Toggle';
 import { useChat } from 'ai/react';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css'; // Import KaTeX CSS
 
 export default function FolderClient({
   folderName,
@@ -45,29 +50,82 @@ export default function FolderClient({
   const [error, setError] = useState('');
   const [chatOnlyView, setChatOnlyView] = useState(false);
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
-    useChat({
-      api: '/api/chat',
-      body: {
-        folderName,
-      },
-      onResponse(response) {
-        const sourcesHeader = response.headers.get('x-sources');
-        const sources = sourcesHeader ? JSON.parse(atob(sourcesHeader)) : [];
+  const [messages, setMessages] = useState([]);
+  const { input, handleInputChange, handleSubmit, isLoading } = useChat({
+    api: '/api/chat',
+    body: {
+      folderName,
+    },
+    async onResponse(response) {
+      console.log('Response received');
+      if (!response.body) {
+        setError('No response body found');
+        console.error('No response body found');
+        return;
+      }
 
-        const messageIndexHeader = response.headers.get('x-message-index');
-        if (sources.length && messageIndexHeader !== null) {
-          setSourcesForMessages({
-            ...sourcesForMessages,
-            [messageIndexHeader]: sources,
+      const reader = response.body.getReader();
+      const textDecoder = new TextDecoder();
+      let completeResponse = '';
+      let sources = [];
+
+      try {
+        while (true) {
+          console.log('Reading from stream...');
+          const { done, value } = await reader.read();
+          if (done) {
+            console.log('Stream reading done');
+            break;
+          }
+
+          const decodedValue = textDecoder.decode(value, { stream: true });
+          console.log('Decoded value:', decodedValue);
+          completeResponse += decodedValue;
+
+          // Update the last assistant message with the streaming response
+          setMessages((prevMessages) => {
+            const newMessages = [...prevMessages];
+            if (newMessages.length === 0 || newMessages[newMessages.length - 1]?.role !== 'assistant') {
+              newMessages.push({ role: 'assistant', content: decodedValue });
+            } else {
+              newMessages[newMessages.length - 1].content = completeResponse;
+            }
+            return newMessages;
           });
         }
-      },
-      onError: (e) => {
+
+        reader.releaseLock(); // Ensure the reader is released
+
+      } catch (e) {
         setError(e.message);
-      },
-      onFinish() {},
-    });
+        console.error('Error while reading stream:', e);
+        return;
+      }
+
+      const sourcesHeader = response.headers.get('x-sources');
+      sources = sourcesHeader ? JSON.parse(atob(sourcesHeader)) : [];
+      console.log('Sources:', sources);
+
+      const messageIndexHeader = response.headers.get('x-message-index');
+      const messageIndex = messageIndexHeader ? parseInt(messageIndexHeader, 10) : messages.length - 1;
+
+      if (sources.length && messageIndex !== null) {
+        setSourcesForMessages((prevSources) => ({
+          ...prevSources,
+          [messageIndex]: sources,
+        }));
+      }
+
+      console.log('Complete response:', completeResponse);
+    },
+    onError: (e) => {
+      setError(e.message);
+      console.error('Error in onResponse:', e);
+    },
+    onFinish() {
+      console.log('Response finished');
+    },
+  });
 
   const messageListRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -78,11 +136,19 @@ export default function FolderClient({
 
   // Prevent empty chat submissions
   const handleEnter = (e: any) => {
-    if (e.key === 'Enter' && messages) {
+    if (e.key === 'Enter' && input.trim()) {
+      e.preventDefault();
+      setMessages((prevMessages) => [...prevMessages, { role: 'user', content: input }]);
       handleSubmit(e);
-    } else if (e.key == 'Enter') {
+    } else if (e.key === 'Enter') {
       e.preventDefault();
     }
+  };
+
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+    setMessages((prevMessages) => [...prevMessages, { role: 'user', content: input }]);
+    handleSubmit(e);
   };
 
   let userProfilePic = userImage ? userImage : '/profile-icon.png';
@@ -92,6 +158,21 @@ export default function FolderClient({
   }) => {
     return source.metadata['loc.pageNumber'] ?? source.metadata.loc?.pageNumber;
   };
+
+  const extractSourceFileName = (source: {
+    metadata: Record<string, any>;
+  }) => {
+    return source.metadata.fileName ?? 'Unknown Document';
+  };
+
+  const handleSourceClick = (fileName: string, pageNumber: number) => {
+    const document = documents.find((doc) => doc.fileName === fileName);
+    if (document) {
+      setSelectedDocument(document);
+      pageNavigationPluginInstance.jumpToPage(pageNumber - 1);
+    }
+  };
+
 
   return (
     <div className="mx-auto flex flex-col no-scrollbar -mt-2">
@@ -180,7 +261,11 @@ export default function FolderClient({
                           className="mr-4 rounded-sm h-full"
                           priority
                         />
-                        <ReactMarkdown linkTarget="_blank" className="prose">
+                        <ReactMarkdown 
+                            className="prose"
+                            remarkPlugins={[remarkGfm, remarkMath]}
+                            rehypePlugins={[rehypeRaw, rehypeKatex]}
+                        >
                           {message.content}
                         </ReactMarkdown>
                       </div>
@@ -201,15 +286,16 @@ export default function FolderClient({
                             })
                             .map((source: any) => (
                               <button
-                                key={source.metadata.loc.pageNumber}
+                                key={`${source.metadata.fileName}-${source.metadata.loc.pageNumber}`}
                                 className="border bg-gray-200 px-3 py-1 hover:bg-gray-100 transition rounded-lg"
                                 onClick={() =>
-                                  pageNavigationPluginInstance.jumpToPage(
-                                    Number(extractSourcePageNumber(source)) - 1,
+                                  handleSourceClick(
+                                    extractSourceFileName(source),
+                                    Number(extractSourcePageNumber(source))
                                   )
                                 }
                               >
-                                p. {extractSourcePageNumber(source)}
+                                {extractSourceFileName(source)} - p. {extractSourcePageNumber(source)}
                               </button>
                             ))}
                         </div>
@@ -222,7 +308,7 @@ export default function FolderClient({
           </div>
           <div className="flex justify-center items-center sm:h-[15vh] h-[20vh]">
             <form
-              onSubmit={(e) => handleSubmit(e)}
+              onSubmit={handleSubmitForm}
               className="relative w-full px-4 sm:pt-10 pt-2"
             >
               <textarea

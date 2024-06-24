@@ -17,7 +17,7 @@ export default function Toggle({ chatOnlyView, setChatOnlyView }: any) {
               chatOnlyView ? 'text-gray-400' : 'text-gray-900 font-semibold'
             }`}
           >
-            PDF + Chat
+            Doc + Chat
           </span>{' '}
         </Switch.Label>
         <Switch
