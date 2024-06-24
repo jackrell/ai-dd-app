@@ -86,7 +86,7 @@ export default function FolderClient({
           setMessages((prevMessages) => {
             const newMessages = [...prevMessages];
             if (newMessages.length === 0 || newMessages[newMessages.length - 1]?.role !== 'assistant') {
-              newMessages.push({ role: 'assistant', content: decodedValue });
+              newMessages.push({ role: 'assistant', content: completeResponse });
             } else {
               newMessages[newMessages.length - 1].content = completeResponse;
             }
@@ -172,7 +172,6 @@ export default function FolderClient({
       pageNavigationPluginInstance.jumpToPage(pageNumber - 1);
     }
   };
-
 
   return (
     <div className="mx-auto flex flex-col no-scrollbar -mt-2">
@@ -262,9 +261,17 @@ export default function FolderClient({
                           priority
                         />
                         <ReactMarkdown 
-                            className="prose"
-                            remarkPlugins={[remarkGfm, remarkMath]}
-                            rehypePlugins={[rehypeRaw, rehypeKatex]}
+                          className="prose"
+                          remarkPlugins={[remarkGfm, remarkMath]}
+                          rehypePlugins={[rehypeRaw, rehypeKatex]}
+                          components={{
+                            ol: ({ children }) => <ol className="list-decimal ml-6">{children}</ol>,
+                            ul: ({ children }) => <ul className="list-disc ml-6">{children}</ul>,
+                            h1: ({ children }) => <h1 className="text-2xl font-bold">{children}</h1>,
+                            h2: ({ children }) => <h2 className="text-xl font-bold">{children}</h2>,
+                            h3: ({ children }) => <h3 className="text-lg font-bold">{children}</h3>,
+                            p: ({ children }) => <p className="my-2">{children}</p>,
+                          }}
                         >
                           {message.content}
                         </ReactMarkdown>
