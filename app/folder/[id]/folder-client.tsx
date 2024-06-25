@@ -156,7 +156,7 @@ export default function FolderClient({
   const extractSourcePageNumber = (source: {
     metadata: Record<string, any>;
   }) => {
-    return source.metadata['loc.pageNumber'] ?? source.metadata.loc?.pageNumber;
+    return source.metadata['loc.pageNumber'] ?? 1;
   };
 
   const extractSourceFileName = (source: {
@@ -293,7 +293,7 @@ export default function FolderClient({
                             })
                             .map((source: any) => (
                               <button
-                                key={`${source.metadata.fileName}-${source.metadata.loc.pageNumber}`}
+                                key={`${source.metadata.fileName}-${extractSourcePageNumber(source)}`}
                                 className="border bg-gray-200 px-3 py-1 hover:bg-gray-100 transition rounded-lg"
                                 onClick={() =>
                                   handleSourceClick(

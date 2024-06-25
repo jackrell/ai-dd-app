@@ -6,12 +6,11 @@ import { getAuth } from '@clerk/nextjs/server';
 import { loadEmbeddingsModel } from '../utils/embeddings';
 import { loadVectorStore } from '../utils/vector_store';
 
-
-// need to add in a folderName with the JSON somehow? and make sure documents are an array?
-
 export async function POST(request: Request) {
+  console.log('requesting documents');
   const { documents, folderName } = await request.json();
   // Each document should have fileUrl and fileName
+  console.log('documents, folderName obtained');
 
   // comment back in for authentication
    const { userId } = getAuth(request as any);

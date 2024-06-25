@@ -20,52 +20,47 @@ export async function loadVectorStore({
       namespace,
       embeddings,
     });
-  } else if (vectorStoreEnv === 'mongodb') {
-    return await loadMongoDBStore({
-      embeddings,
-    });
+  // } else if (vectorStoreEnv === 'mongodb') {
+  //   return await loadMongoDBStore({
+  //     embeddings,
+  //   });
   } else {
     throw new Error(`Invalid vector store id provided: ${vectorStoreEnv}`);
   }
 }
 
 export async function loadRetriever({
+  namespace,
   embeddings,
-  chatId,
   callbacks,
 }: {
   namespace: string;
   embeddings: Embeddings;
-  chatId: string;
   callbacks?: Callbacks;
 }) {
-  let mongoDbClient;
   const store = await loadVectorStore({
-    namespace: chatId,
+    namespace,
     embeddings,
   });
   const vectorstore = store.vectorstore;
-  if ('mongoDbClient' in store) {
-    mongoDbClient = store.mongoDbClient;
-  }
-  // For Mongo, we will use metadata filtering to separate documents.
-  // For Pinecone, we will use namespaces, so no filter is necessary.
+
   const filter =
     process.env.NEXT_PUBLIC_VECTORSTORE === 'mongodb'
       ? {
           preFilter: {
             docstore_document_id: {
-              $eq: chatId,
+              $eq: namespace,
             },
           },
         }
       : undefined;
+
   const retriever = vectorstore.asRetriever({
     filter,
     callbacks,
   });
+
   return {
     retriever,
-    mongoDbClient,
   };
 }

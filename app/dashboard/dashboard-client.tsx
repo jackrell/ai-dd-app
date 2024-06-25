@@ -53,7 +53,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
         fileName: file.originalFile.originalFileName || file.filePath,
       }));
 
-      console.log('Ingesting PDFs:', documents);
+      console.log('Ingesting PDFs:', documents, 'Folder Name:', folderName);
 
       let res = await fetch('/api/ingestPDF', {
         method: 'POST',
@@ -67,11 +67,17 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
       });
 
       let data = await res.json();
-      setLoading(false);
-      router.push(`/folder/${folderName}`);
-
+      console.log('Ingest API response:', data);
+      
+      if (data.error) {
+        console.error('Error ingesting PDFs:', data.error);
+      } else {
+        console.log('PDFs ingested successfully:', data.results);
+        router.push(`folder/${folderName}`);
+      }
     } catch (error) {
       console.error('Error during ingestion:', error);
+    } finally {
       setLoading(false);
     }
   }
@@ -79,7 +85,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
   return (
     <div className="mx-auto flex flex-col gap-4 container mt-10">
       <h1 className="text-4xl leading-[1.1] tracking-tighter font-medium text-center">
-        Chat With Your PDFs
+        Chat With Your Datarooms
       </h1>
       {foldersList.length > 0 && (
         <div className="flex flex-col gap-4 mx-10 my-5">
