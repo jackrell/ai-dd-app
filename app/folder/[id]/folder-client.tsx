@@ -291,20 +291,22 @@ export default function FolderClient({
                                 ) === index
                               );
                             })
-                            .map((source: any) => (
-                              <button
-                                key={`${source.metadata.fileName}-${extractSourcePageNumber(source)}`}
+                            .map((source: any) => {
+                              const fileName = extractSourceFileName(source);
+                              const pageNumber = extractSourcePageNumber(source);
+                              return (
+                                <button
+                                key={`${fileName}-${pageNumber}`}
                                 className="border bg-gray-200 px-3 py-1 hover:bg-gray-100 transition rounded-lg"
                                 onClick={() =>
-                                  handleSourceClick(
-                                    extractSourceFileName(source),
-                                    Number(extractSourcePageNumber(source))
-                                  )
+                                  handleSourceClick(fileName, Number(pageNumber))
                                 }
                               >
-                                {extractSourceFileName(source)} - p. {extractSourcePageNumber(source)}
+                                {fileName} - p. {pageNumber}
                               </button>
-                            ))}
+                              );
+                            }
+                            )}
                         </div>
                       )}
                     </div>

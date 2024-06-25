@@ -10,13 +10,14 @@ import { useState } from 'react';
 // Configuration for the uploader
 const uploader = Uploader({
   apiKey: process.env.NEXT_PUBLIC_BYTESCALE_API_KEY || 'no api key found',
+  options: { autoUpload: false }, // Disable automatic upload
 });
 
 export default function DashboardClient({ foldersList }: { foldersList: any }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [folderName, setFolderName] = useState('');
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState<any[]>([]);
 
   const options = {
     maxFileCount: 15, // Allow multiple files
@@ -36,7 +37,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
       options={options}
       onUpdate={(files) => {
         if (files.length > 0) {
-          setSelectedFiles(files);
+          setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
         }
       }}
       width="470px"
@@ -44,7 +45,11 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
     />
   );
 
-  async function ingestPdfs(documents: { fileUrl: string, fileName: string }[]) {
+  const handleRemoveFile = (fileUrl: string) => {
+    setSelectedFiles((prevFiles) => prevFiles.filter((file) => file.fileUrl !== fileUrl));
+  };
+
+  async function ingestPdfs() {
     setLoading(true);
 
     try {
@@ -53,7 +58,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
         fileName: file.originalFile.originalFileName || file.filePath,
       }));
 
-      console.log('Ingesting PDFs:', documents, 'Folder Name:', folderName);
+      console.log('Ingesting PDFs:', documents);
 
       let res = await fetch('/api/ingestPDF', {
         method: 'POST',
@@ -66,18 +71,13 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
         }),
       });
 
+      console.log('res:', res);
       let data = await res.json();
-      console.log('Ingest API response:', data);
-      
-      if (data.error) {
-        console.error('Error ingesting PDFs:', data.error);
-      } else {
-        console.log('PDFs ingested successfully:', data.results);
-        router.push(`folder/${folderName}`);
-      }
+      setLoading(false);
+      router.push(`/folder/${folderName}`);
+
     } catch (error) {
       console.error('Error during ingestion:', error);
-    } finally {
       setLoading(false);
     }
   }
@@ -125,14 +125,32 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
           placeholder="Folder Name"
           value={folderName}
           onChange={(e) => setFolderName(e.target.value)}
-          className="mb-4"
+          className="mb-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           required
         />
         <UploadDropZone />
         {selectedFiles.length > 0 && (
+          <div className="mt-4 w-full">
+            <h3 className="text-lg font-medium mb-2">Selected Files:</h3>
+            <ul className="list-disc list-inside">
+              {selectedFiles.map((file) => (
+                <li key={file.fileUrl} className="flex justify-between items-center mb-2">
+                  <span>{file.originalFile.originalFileName || file.filePath}</span>
+                  <button
+                    onClick={() => handleRemoveFile(file.fileUrl)}
+                    className="ml-4 text-red-600 hover:text-red-800 transition"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {selectedFiles.length > 0 && (
           <button
             onClick={ingestPdfs}
-            className="mt-4 px-4 py-2 font-semibold leading-6 text-lg shadow rounded-md text-black transition ease-in-out duration-150 bg-blue-500 hover:bg-blue-600 text-white"
+            className="mt-4 px-4 py-2 font-semibold leading-6 text-lg shadow rounded-md text-white transition ease-in-out duration-150 bg-blue-500 hover:bg-blue-600"
           >
             Finish and Ingest PDFs
           </button>
@@ -169,3 +187,4 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
     </div>
   );
 }
+

@@ -6,6 +6,24 @@ import { getAuth } from '@clerk/nextjs/server';
 import { loadEmbeddingsModel } from '../utils/embeddings';
 import { loadVectorStore } from '../utils/vector_store';
 
+async function fetchWithRetry(url: string, options: any, retries = 3, delay = 1000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response;
+    } catch (error) {
+      if (i < retries - 1) {
+        console.warn(`Fetch failed, retrying in ${delay}ms... (${i + 1}/${retries})`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      } else {
+        throw error;
+      }
+    }
+  }
+}
+
+
 export async function POST(request: Request) {
   console.log('requesting documents');
   const { documents, folderName } = await request.json();
@@ -41,7 +59,7 @@ export async function POST(request: Request) {
       console.log(`Created document record for: ${fileName}`);
 
       /* load from remote pdf URL */
-      const response = await fetch(fileUrl);
+      const response = await fetchWithRetry(fileUrl, { method: 'GET' }, 3, 2000);
       const arrayBuffer = await response.arrayBuffer();
       const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
       const loader = new PDFLoader(blob);
