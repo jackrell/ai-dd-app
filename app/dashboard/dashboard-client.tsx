@@ -3,7 +3,6 @@
 import { UploadDropzone } from 'react-uploader';
 import { Uploader } from 'uploader';
 import { useRouter } from 'next/navigation';
-// import DocIcon from '@/components/ui/DocIcon'; NEED TO get doc image
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
 
@@ -37,7 +36,10 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
       options={options}
       onUpdate={(files) => {
         if (files.length > 0) {
-          setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
+          setSelectedFiles((prevFiles) => {
+            const newFiles = files.filter((file) => !prevFiles.some((prevFile) => prevFile.fileUrl === file.fileUrl));
+            return [...prevFiles, ...newFiles];
+          });
         }
       }}
       width="470px"
@@ -99,7 +101,6 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
                   onClick={() => router.push(`/folder/${folder.namespace}`)}
                   className="flex gap-4"
                 >
-                  {/* <DocIcon /> */}
                   <span>{folder.namespace}</span>
                 </button>
                 <span>
@@ -187,4 +188,3 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
     </div>
   );
 }
-

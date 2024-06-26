@@ -138,7 +138,11 @@ export default function FolderClient({
   const handleEnter = (e: any) => {
     if (e.key === 'Enter' && input.trim()) {
       e.preventDefault();
-      setMessages((prevMessages) => [...prevMessages, { role: 'user', content: input }]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { role: 'user', content: input },
+        { role: 'assistant', content: '' }, // Add placeholder for assistant message
+      ]);
       handleSubmit(e);
     } else if (e.key === 'Enter') {
       e.preventDefault();
@@ -147,7 +151,11 @@ export default function FolderClient({
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
-    setMessages((prevMessages) => [...prevMessages, { role: 'user', content: input }]);
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { role: 'user', content: input },
+      { role: 'assistant', content: '' }, // Add placeholder for assistant message
+    ]);
     handleSubmit(e);
   };
 
@@ -156,7 +164,7 @@ export default function FolderClient({
   const extractSourcePageNumber = (source: {
     metadata: Record<string, any>;
   }) => {
-    return source.metadata['loc.pageNumber'] ?? 1;
+    return source.metadata['loc.pageNumber'] ?? source.metadata.loc?.pageNumber ?? 1;
   };
 
   const extractSourceFileName = (source: {
@@ -231,18 +239,13 @@ export default function FolderClient({
                 </div>
               )}
               {messages.map((message, index) => {
-                const sources = sourcesForMessages[index] || undefined;
-                const isLastMessage =
-                  !isLoading && index === messages.length - 1;
-                const previousMessages = index !== messages.length - 1;
+                const sources = sourcesForMessages[index + 1] || undefined; // Shift the source index by 1
                 return (
                   <div key={`chatMessage-${index}`}>
                     <div
                       className={`p-4 text-black animate ${
                         message.role === 'assistant'
                           ? 'bg-gray-100'
-                          : isLoading && index === messages.length - 1
-                          ? 'animate-pulse bg-white'
                           : 'bg-white'
                       }`}
                     >
@@ -277,12 +280,11 @@ export default function FolderClient({
                         </ReactMarkdown>
                       </div>
                       {/* Display the sources */}
-                      {(isLastMessage || previousMessages) && sources && (
+                      {message.role === 'assistant' && sources && (
                         <div className="flex space-x-4 ml-14 mt-3">
                           {sources
                             .filter((source: any, index: number, self: any) => {
-                              const pageNumber =
-                                extractSourcePageNumber(source);
+                              const pageNumber = extractSourcePageNumber(source);
                               // Check if the current pageNumber is the first occurrence in the array
                               return (
                                 self.findIndex(
@@ -296,17 +298,16 @@ export default function FolderClient({
                               const pageNumber = extractSourcePageNumber(source);
                               return (
                                 <button
-                                key={`${fileName}-${pageNumber}`}
-                                className="border bg-gray-200 px-3 py-1 hover:bg-gray-100 transition rounded-lg"
-                                onClick={() =>
-                                  handleSourceClick(fileName, Number(pageNumber))
-                                }
-                              >
-                                {fileName} - p. {pageNumber}
-                              </button>
+                                  key={`${fileName}-${pageNumber}`}
+                                  className="border bg-gray-200 px-3 py-1 hover:bg-gray-100 transition rounded-lg"
+                                  onClick={() =>
+                                    handleSourceClick(fileName, Number(pageNumber))
+                                  }
+                                >
+                                  {fileName} - p. {pageNumber}
+                                </button>
                               );
-                            }
-                            )}
+                            })}
                         </div>
                       )}
                     </div>

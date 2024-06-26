@@ -1,3 +1,5 @@
+import Header from '@/components/ui/Header';
+
 export default function RootLayout({
     children,
   }: {
@@ -5,7 +7,8 @@ export default function RootLayout({
   }) {
     return (
       <div className="min-h-screen flex flex-col">
-        {children}
+        <Header />
+        <div className="flex-grow">{children}</div>
       </div>
     );
   }
