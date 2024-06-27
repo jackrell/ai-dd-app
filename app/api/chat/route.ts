@@ -79,6 +79,8 @@ export async function POST(req: NextRequest) {
       ),
     ).toString('base64');
 
+
+    // covert to bytes so we can stream
     const byteStream = stream.pipeThrough(new TextEncoderStream());
 
     return new Response(byteStream, {

@@ -7,10 +7,7 @@ import LoadingDots from '@/components/ui/LoadingDots';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
-import type {
-  ToolbarSlot,
-  TransformToolbarSlot,
-} from '@react-pdf-viewer/toolbar';
+import type { ToolbarSlot, TransformToolbarSlot } from '@react-pdf-viewer/toolbar';
 import { toolbarPlugin } from '@react-pdf-viewer/toolbar';
 import { pageNavigationPlugin } from '@react-pdf-viewer/page-navigation';
 import Toggle from '@/components/ui/Toggle';
@@ -21,15 +18,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css'; // Import KaTeX CSS
 
-export default function FolderClient({
-  folderName,
-  documents,
-  userImage,
-}: {
-  folderName: string;
-  documents: Document[];
-  userImage?: string;
-}) {
+export default function FolderClient({ folderName, documents, userImage }: { folderName: string; documents: Document[]; userImage?: string }) {
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(documents[0]);
   const toolbarPluginInstance = toolbarPlugin();
   const pageNavigationPluginInstance = pageNavigationPlugin();
@@ -44,18 +33,14 @@ export default function FolderClient({
 
   const pdfUrl = selectedDocument?.fileUrl;
 
-  const [sourcesForMessages, setSourcesForMessages] = useState<
-    Record<string, any>
-  >({});
+  const [sourcesForMessages, setSourcesForMessages] = useState<Record<number, any[]>>({});
   const [error, setError] = useState('');
   const [chatOnlyView, setChatOnlyView] = useState(false);
 
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const { input, handleInputChange, handleSubmit, isLoading } = useChat({
     api: '/api/chat',
-    body: {
-      folderName,
-    },
+    body: { folderName },
     async onResponse(response) {
       console.log('Response received');
       if (!response.body) {
@@ -82,7 +67,6 @@ export default function FolderClient({
           console.log('Decoded value:', decodedValue);
           completeResponse += decodedValue;
 
-          // Update the last assistant message with the streaming response
           setMessages((prevMessages) => {
             const newMessages = [...prevMessages];
             if (newMessages.length === 0 || newMessages[newMessages.length - 1]?.role !== 'assistant') {
@@ -94,8 +78,7 @@ export default function FolderClient({
           });
         }
 
-        reader.releaseLock(); // Ensure the reader is released
-
+        reader.releaseLock();
       } catch (e) {
         setError(e.message);
         console.error('Error while reading stream:', e);
@@ -106,15 +89,12 @@ export default function FolderClient({
       sources = sourcesHeader ? JSON.parse(atob(sourcesHeader)) : [];
       console.log('Sources:', sources);
 
-      const messageIndexHeader = response.headers.get('x-message-index');
-      const messageIndex = messageIndexHeader ? parseInt(messageIndexHeader, 10) : messages.length - 1;
-
-      if (sources.length && messageIndex !== null) {
-        setSourcesForMessages((prevSources) => ({
-          ...prevSources,
-          [messageIndex]: sources,
-        }));
-      }
+      setMessages((prevMessages) => {
+        const newMessages = [...prevMessages];
+        const messageIndex = newMessages.length - 1;
+        setSourcesForMessages((prevSources) => ({ ...prevSources, [messageIndex]: sources }));
+        return newMessages;
+      });
 
       console.log('Complete response:', completeResponse);
     },
@@ -134,15 +114,10 @@ export default function FolderClient({
     textAreaRef.current?.focus();
   }, []);
 
-  // Prevent empty chat submissions
   const handleEnter = (e: any) => {
     if (e.key === 'Enter' && input.trim()) {
       e.preventDefault();
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { role: 'user', content: input },
-        { role: 'assistant', content: '' }, // Add placeholder for assistant message
-      ]);
+      setMessages((prevMessages) => [...prevMessages, { role: 'user', content: input }, { role: 'assistant', content: '' }]);
       handleSubmit(e);
     } else if (e.key === 'Enter') {
       e.preventDefault();
@@ -151,25 +126,17 @@ export default function FolderClient({
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { role: 'user', content: input },
-      { role: 'assistant', content: '' }, // Add placeholder for assistant message
-    ]);
+    setMessages((prevMessages) => [...prevMessages, { role: 'user', content: input }, { role: 'assistant', content: '' }]);
     handleSubmit(e);
   };
 
   let userProfilePic = userImage ? userImage : '/profile-icon.png';
 
-  const extractSourcePageNumber = (source: {
-    metadata: Record<string, any>;
-  }) => {
+  const extractSourcePageNumber = (source: { metadata: Record<string, any> }) => {
     return source.metadata['loc.pageNumber'] ?? source.metadata.loc?.pageNumber ?? 1;
   };
 
-  const extractSourceFileName = (source: {
-    metadata: Record<string, any>;
-  }) => {
+  const extractSourceFileName = (source: { metadata: Record<string, any> }) => {
     return source.metadata.fileName ?? 'Unknown Document';
   };
 
@@ -187,25 +154,12 @@ export default function FolderClient({
       <div className="flex justify-between w-full lg:flex-row flex-col sm:space-y-20 lg:space-y-0 p-2">
         {/* Left hand side */}
         <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.js">
-          <div
-            className={`w-full h-[90vh] flex-col text-white !important ${
-              chatOnlyView ? 'hidden' : 'flex'
-            }`}
-          >
-            <div
-              className="align-center bg-[#eeeeee] flex p-1"
-              style={{
-                borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
-              }}
-            >
+          <div className={`w-full h-[90vh] flex-col text-white !important ${chatOnlyView ? 'hidden' : 'flex'}`}>
+            <div className="align-center bg-[#eeeeee] flex p-1" style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
               <Toolbar>{renderDefaultToolbar(transform)}</Toolbar>
               <select
                 value={selectedDocument?.id}
-                onChange={(e) =>
-                  setSelectedDocument(
-                    documents.find((doc) => doc.id === e.target.value) || null
-                  )
-                }
+                onChange={(e) => setSelectedDocument(documents.find((doc) => doc.id === e.target.value) || null)}
                 className="ml-4 p-2 rounded"
               >
                 {documents.map((doc) => (
@@ -215,55 +169,30 @@ export default function FolderClient({
                 ))}
               </select>
             </div>
-            {pdfUrl && (
-              <Viewer
-                fileUrl={pdfUrl}
-                plugins={[toolbarPluginInstance, pageNavigationPluginInstance]}
-              />
-            )}
+            {pdfUrl && <Viewer fileUrl={pdfUrl} plugins={[toolbarPluginInstance, pageNavigationPluginInstance]} />}
           </div>
         </Worker>
         {/* Right hand side */}
         <div className="flex flex-col w-full justify-between align-center h-[90vh] no-scrollbar">
-          <div
-            className={`w-full min-h-min bg-white border flex justify-center items-center no-scrollbar sm:h-[85vh] h-[80vh]
-            `}
-          >
-            <div
-              ref={messageListRef}
-              className="w-full h-full overflow-y-scroll no-scrollbar rounded-md mt-4"
-            >
-              {messages.length === 0 && (
-                <div className="flex justify-center h-full items-center text-xl">
-                  Ask your first question below!
-                </div>
-              )}
+          <div className={`w-full min-h-min bg-white border flex justify-center items-center no-scrollbar sm:h-[85vh] h-[80vh]`}>
+            <div ref={messageListRef} className="w-full h-full overflow-y-scroll no-scrollbar rounded-md mt-4">
+              {messages.length === 0 && <div className="flex justify-center h-full items-center text-xl">Ask your first question below!</div>}
               {messages.map((message, index) => {
-                const sources = sourcesForMessages[index + 1] || undefined; // Shift the source index by 1
+                const sources = sourcesForMessages[index] || undefined;
                 return (
                   <div key={`chatMessage-${index}`}>
-                    <div
-                      className={`p-4 text-black animate ${
-                        message.role === 'assistant'
-                          ? 'bg-gray-100'
-                          : 'bg-white'
-                      }`}
-                    >
+                    <div className={`p-4 text-black animate ${message.role === 'assistant' ? 'bg-gray-100' : 'bg-white'}`}>
                       <div className="flex">
                         <Image
                           key={index}
-                          src={
-                            message.role === 'assistant'
-                              ? '/bot-icon.png'
-                              : userProfilePic
-                          }
+                          src={message.role === 'assistant' ? '/bot-icon.png' : userProfilePic}
                           alt="profile image"
                           width={message.role === 'assistant' ? '35' : '33'}
                           height="30"
                           className="mr-4 rounded-sm h-full"
                           priority
                         />
-                        <ReactMarkdown 
+                        <ReactMarkdown
                           className="prose"
                           remarkPlugins={[remarkGfm, remarkMath]}
                           rehypePlugins={[rehypeRaw, rehypeKatex]}
@@ -281,17 +210,11 @@ export default function FolderClient({
                       </div>
                       {/* Display the sources */}
                       {message.role === 'assistant' && sources && (
-                        <div className="flex space-x-4 ml-14 mt-3">
+                        <div className="flex flex-col space-y-2 ml-14 mt-3">
                           {sources
                             .filter((source: any, index: number, self: any) => {
                               const pageNumber = extractSourcePageNumber(source);
-                              // Check if the current pageNumber is the first occurrence in the array
-                              return (
-                                self.findIndex(
-                                  (s: any) =>
-                                    extractSourcePageNumber(s) === pageNumber,
-                                ) === index
-                              );
+                              return self.findIndex((s: any) => extractSourcePageNumber(s) === pageNumber) === index;
                             })
                             .map((source: any) => {
                               const fileName = extractSourceFileName(source);
@@ -300,9 +223,7 @@ export default function FolderClient({
                                 <button
                                   key={`${fileName}-${pageNumber}`}
                                   className="border bg-gray-200 px-3 py-1 hover:bg-gray-100 transition rounded-lg"
-                                  onClick={() =>
-                                    handleSourceClick(fileName, Number(pageNumber))
-                                  }
+                                  onClick={() => handleSourceClick(fileName, Number(pageNumber))}
                                 >
                                   {fileName} - p. {pageNumber}
                                 </button>
@@ -317,10 +238,7 @@ export default function FolderClient({
             </div>
           </div>
           <div className="flex justify-center items-center sm:h-[15vh] h-[20vh]">
-            <form
-              onSubmit={handleSubmitForm}
-              className="relative w-full px-4 sm:pt-10 pt-2"
-            >
+            <form onSubmit={handleSubmitForm} className="relative w-full px-4 sm:pt-10 pt-2">
               <textarea
                 className="resize-none p-3 pr-10 rounded-md border border-gray-300 bg-white text-black focus:outline-gray-400 w-full"
                 disabled={isLoading}
@@ -333,9 +251,7 @@ export default function FolderClient({
                 maxLength={512}
                 id="userInput"
                 name="userInput"
-                placeholder={
-                  isLoading ? 'Waiting for response...' : 'Ask me anything...'
-                }
+                placeholder={isLoading ? 'Waiting for response...' : 'Ask me anything...'}
               />
               <button
                 type="submit"
@@ -347,11 +263,7 @@ export default function FolderClient({
                     <LoadingDots color="#000" style="small" />
                   </div>
                 ) : (
-                  <svg
-                    viewBox="0 0 20 20"
-                    className="transform rotate-90 w-6 h-6 fill-current"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
+                  <svg viewBox="0 0 20 20" className="transform rotate-90 w-6 h-6 fill-current" xmlns="http://www.w3.org/2000/svg">
                     <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
                   </svg>
                 )}
