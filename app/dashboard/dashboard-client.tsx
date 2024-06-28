@@ -51,6 +51,11 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
     setSelectedFiles((prevFiles) => prevFiles.filter((file) => file.fileUrl !== fileUrl));
   };
 
+  const handleFolderNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^a-zA-Z0-9_-]/g, '');
+    setFolderName(value);
+  };
+
   async function ingestPdfs() {
     setLoading(true);
 
@@ -125,7 +130,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
           type="text"
           placeholder="Folder Name"
           value={folderName}
-          onChange={(e) => setFolderName(e.target.value)}
+          onChange={handleFolderNameChange}
           className="mb-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           required
         />

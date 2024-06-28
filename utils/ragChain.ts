@@ -11,7 +11,6 @@ import {
 import type { Runnable } from '@langchain/core/runnables';
 import type { BaseMessage } from '@langchain/core/messages';
 
-// NEED TO UPDATE THE QUERY SYSTEM.
 
 const historyAwarePrompt = ChatPromptTemplate.fromMessages([
   new MessagesPlaceholder('chat_history'),

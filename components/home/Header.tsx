@@ -12,7 +12,6 @@ const Header = () => {
       <div className="container hidden bg-white w-full px-5 h-[78px] sm:flex justify-between items-center border shadow-[0px_1px_4px_0px_rgba(0,0,0,0.25)] rounded-[30px] border-solid border-[rgba(0,0,0,0.17)] mx-auto">
         <Link href="/" className="flex items-center">
           <Logo />
-          <span className="text-2xl font-bold ml-2">Add Logo</span>
         </Link>
         <div className="sm:flex gap-4 items-center">
           <Link
