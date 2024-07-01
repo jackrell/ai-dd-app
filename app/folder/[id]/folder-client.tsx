@@ -17,12 +17,30 @@ import rehypeRaw from 'rehype-raw';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css'; // Import KaTeX CSS
+import { useAuth } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 
 export default function FolderClient({ folderName, documents, userImage }: { folderName: string; documents: Document[]; userImage?: string }) {
+  const { isLoaded, isSignedIn } = useAuth();
+  const router = useRouter();
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(documents[0]);
   const toolbarPluginInstance = toolbarPlugin();
   const pageNavigationPluginInstance = pageNavigationPlugin();
   const { renderDefaultToolbar, Toolbar } = toolbarPluginInstance;
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.push('/sign-in');
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  if (!isLoaded || !isSignedIn) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LoadingDots color="#000" />
+      </div>
+    );
+  }
 
   const transform: TransformToolbarSlot = (slot: ToolbarSlot) => ({
     ...slot,

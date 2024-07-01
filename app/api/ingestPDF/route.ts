@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
-import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
+// import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
+// import pdfParse from 'pdf-parse';
+// import { WebPDFLoader } from '@langchain/community/document_loaders/web/pdf';
+import pdf from 'pdf-parse';
 import prisma from '@/utils/prisma';
 import { getAuth } from '@clerk/nextjs/server';
 import { loadEmbeddingsModel } from '../utils/embeddings';
@@ -60,10 +63,32 @@ export async function POST(request: Request) {
       console.log(`Created document record for: ${fileName}`);
 
       const response = await fetchWithRetry(fileUrl, { method: 'GET' }, 5, 5000);
+
+      // langchain pdf-loader method
       const arrayBuffer = await response.arrayBuffer();
       const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
       const loader = new PDFLoader(blob);
       const rawDocs = await loader.load();
+
+      // // pdf-parse method
+      // const arrayBuffer = await response.arrayBuffer();
+      // const buffer = Buffer.from(arrayBuffer);
+      // const pdfData = await pdfParse(buffer);
+      // const rawDocs = [{ pageContent: pdfData.text }];
+
+      // // web loader method 
+      // const arrayBuffer = await response.arrayBuffer();
+      // const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+      // const loader = new WebPDFLoader(blob, {
+      //   // you may need to add `.then(m => m.default)` to the end of the import
+      //   pdfjs: () => import('pdfjs-dist/build/pdf').then(m => m.default),
+      // });
+      // const rawDocs = await loader.load();
+
+      // // pdf-parse method 2
+      // const arrayBuffer = await response.arrayBuffer();
+      // const buffer = Buffer.from(arrayBuffer);
+      // const data = await pdf(buffer);
 
       console.log(`Loaded PDF: ${fileName}`);
 
@@ -72,6 +97,7 @@ export async function POST(request: Request) {
         chunkOverlap: 300,
       });
       const splitDocs = await textSplitter.splitDocuments(rawDocs);
+      // const splitDocs = await textSplitter.splitDocuments([{ pageContent: data.text, metadata: { fileName } }]);
 
       splitDocs.forEach((splitDoc) => {
         splitDoc.metadata.fileName = fileName;

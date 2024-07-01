@@ -4,19 +4,37 @@ import { UploadDropzone } from 'react-uploader';
 import { Uploader } from 'uploader';
 import { useRouter } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@clerk/nextjs';
+import LoadingDots from '@/components/ui/LoadingDots';
+
 
 // Configuration for the uploader
 const uploader = Uploader({
   apiKey: process.env.NEXT_PUBLIC_BYTESCALE_API_KEY || 'no api key found',
-  options: { autoUpload: false }, // Disable automatic upload
+  options: { autoUpload: false }, // Disable automatic upload         (DOESN'T WORK)
 });
 
 export default function DashboardClient({ foldersList }: { foldersList: any }) {
+  const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [folderName, setFolderName] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.push('/sign-in');
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  if (!isLoaded || !isSignedIn) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LoadingDots color="#000" />
+      </div>
+    );
+  }
 
   const options = {
     maxFileCount: 15, // Allow multiple files
@@ -67,7 +85,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
 
       console.log('Ingesting PDFs:', documents);
 
-      let res = await fetch('/api/ingestPDF', {
+      const res = await fetch('/api/ingestPDF', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -79,7 +97,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
       });
 
       console.log('res:', res);
-      let data = await res.json();
+      const data = await res.json();
       setLoading(false);
       router.push(`/folder/${folderName}`);
 
@@ -102,12 +120,12 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
                 key={folder.namespace}
                 className="flex justify-between p-3 hover:bg-gray-100 transition sm:flex-row flex-col sm:gap-0 gap-3"
               >
-                <button
+                <span
                   onClick={() => router.push(`/folder/${folder.namespace}`)}
-                  className="flex gap-4"
+                  className="flex gap-4 cursor-pointer"
                 >
-                  <span>{folder.namespace}</span>
-                </button>
+                  {folder.namespace}
+                </span>
                 <span>
                   {formatDistanceToNow(new Date(folder._min.createdAt))} ago
                 </span>
