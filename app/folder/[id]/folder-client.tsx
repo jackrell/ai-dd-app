@@ -177,8 +177,10 @@ export default function FolderClient({ folderName, documents, userImage }: { fol
               <Toolbar>{renderDefaultToolbar(transform)}</Toolbar>
               <select
                 value={selectedDocument?.id}
-                onChange={(e) => setSelectedDocument(documents.find((doc) => doc.id === e.target.value) || null)}
-                className="ml-4 p-2 rounded"
+                onChange={(e) =>
+                  setSelectedDocument(documents.find((doc) => doc.id === e.target.value) || null)
+                }
+                className="select ml-4 p-2 rounded"
               >
                 {documents.map((doc) => (
                   <option key={doc.id} value={doc.id}>
@@ -186,6 +188,7 @@ export default function FolderClient({ folderName, documents, userImage }: { fol
                   </option>
                 ))}
               </select>
+
             </div>
             {pdfUrl && <Viewer fileUrl={pdfUrl} plugins={[toolbarPluginInstance, pageNavigationPluginInstance]} />}
           </div>

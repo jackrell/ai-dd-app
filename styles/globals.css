@@ -31,3 +31,24 @@
     text-wrap: balance;
   }
 }
+
+.select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: url('/down-arrow-icon.svg') no-repeat right 1rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+  padding-left: 1rem;
+  color: #000; /* Ensure text is visible */
+  background-color: #f3f4f6; /* Change background color if necessary */
+  border: 1px solid #d1d5db; /* Optional border for better visibility */
+  border-radius: 0.375rem; /* Rounded corners */
+  height: 2.5rem; /* Adjust height if necessary */
+}
+
+.select option {
+  color: #000; /* Text color inside dropdown */
+  background-color: #fff; /* Background color inside dropdown */
+  padding: 0.5rem 1rem; /* Padding inside options */
+}

@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       console.log(`Loaded PDF: ${fileName}`);
 
       const textSplitter = new RecursiveCharacterTextSplitter({
-        chunkSize: 1600,
+        chunkSize: 1400,
         chunkOverlap: 300,
       });
       const splitDocs = await textSplitter.splitDocuments(rawDocs);
