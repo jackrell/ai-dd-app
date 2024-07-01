@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
-// import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
+import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
 // import pdfParse from 'pdf-parse';
 // import { WebPDFLoader } from '@langchain/community/document_loaders/web/pdf';
-import pdf from 'pdf-parse';
+// import pdf from 'pdf-parse';
 import prisma from '@/utils/prisma';
 import { getAuth } from '@clerk/nextjs/server';
 import { loadEmbeddingsModel } from '../utils/embeddings';

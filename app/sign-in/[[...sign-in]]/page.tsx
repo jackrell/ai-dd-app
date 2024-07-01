@@ -1,9 +1,10 @@
 import { SignIn } from "@clerk/nextjs";
+import Header from '@/components/home/Header';
 
 export default function Page() {
     return (
-        // <div className="mt-5">
-        //   <Header />
+        <div className="mt-5">
+          <Header />
           <div className="flex mx-auto justify-center items-center mt-10">
             <SignIn
               appearance={{
@@ -15,6 +16,6 @@ export default function Page() {
               afterSignInUrl="/dashboard"
             />
           </div>
-        // </div>
+        </div>
       );
 } 
