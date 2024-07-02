@@ -17,7 +17,7 @@ const historyAwarePrompt = ChatPromptTemplate.fromMessages([
   ['user', '{input}'],
   [
     'user',
-    'Based on the provided context and any relevant past conversations, generate a concise vector store search query to look up in order to get information relevant to the conversation.',
+    'Given the above conversation, generate a concise vector store search query to look up in order to get information relevant to the conversation. Focus on retrieving the most relevant and specific documents to the current query, rather than relying on the entire chat history.',
   ],
 ]);
 
@@ -30,32 +30,10 @@ If the question is not relevant to the provided context, politely indicate that 
 {context}
 </context>
 
-Make sure to extract and reference specific information from the provided context to answer the question. If the information is not directly found in the context, indicate that based on your review of the provided documents.
+Ensure your response is accurate and extract specific information from the provided context. If the information is not directly found in the context, indicate that based on your review of the provided documents.
 
-Your response should be thorough, precise, and structured in markdown format. Follow these guidelines for your response:
+Your response should be thorough, precise, and structured in markdown format, using paragraphs or bullet points as necessary.`;
 
-1. **Heading**: Provide a clear and relevant heading for the main topic.
-2. **Subheadings**: Break down the response into logical sub-sections with subheadings.
-3. **Content Style**: Use paragraphs for detailed explanations and bullet points for lists or key points, depending on what is most appropriate.
-4. **Direct Answers**: Begin with the direct answer to the question if applicable.
-5. **Additional Context**: Offer any additional relevant context or information following the direct answer.
-
-Example Format:
-
-# [Main Topic Heading]
-
-## [Subheading]
-[Paragraph with detailed explanation.]
-
-## [Subheading]
-- [Bullet Point 1]
-- [Bullet Point 2]
-
-Direct Answer: [Your precise answer]
-
-Additional Context: [Any further relevant details]
-
-Please proceed with your response below:`;
 
 
 

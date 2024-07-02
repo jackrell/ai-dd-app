@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import Logo from '../ui/Logo'; // Adjust the import path as needed
+import Logo from '../ui/Logo';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -9,7 +9,7 @@ const Header = () => {
 
   return (
     <>
-      <div className="container hidden bg-white w-full px-5 h-[78px] sm:flex justify-between items-center border shadow-[0px_1px_4px_0px_rgba(0,0,0,0.25)] rounded-[30px] border-solid border-[rgba(0,0,0,0.17)] mx-auto">
+      <div className="container hidden sm:flex bg-white w-full px-5 h-[78px] justify-between items-center border shadow-[0px_1px_4px_0px_rgba(0,0,0,0.25)] rounded-[30px] border-solid border-[rgba(0,0,0,0.17)] mx-auto">
         <Link href="/" className="flex items-center">
           <Logo />
         </Link>
@@ -26,7 +26,7 @@ const Header = () => {
       <div className="sm:hidden bg-white shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] border-b-[0.5px] h-[54px] flex justify-between items-center px-6 border-b-white border-solid">
         <Link href="/" className="flex items-center">
           <Logo isMobile={true} />
-          <span className="text-xl font-bold ml-2">Your Logo</span>
+          <span className="text-xl font-bold ml-2">Dataroom Chat</span>
         </Link>
         <div className="flex justify-center items-baseline">
           <Image
@@ -39,7 +39,7 @@ const Header = () => {
           />
         </div>
       </div>
-      {open ? (
+      {open && (
         <div className="flex sm:hidden gap-4 items-center py-3 bg-white shadow px-5">
           <Link
             href="/sign-in"
@@ -48,7 +48,7 @@ const Header = () => {
             Log in
           </Link>
         </div>
-      ) : null}
+      )}
     </>
   );
 };
