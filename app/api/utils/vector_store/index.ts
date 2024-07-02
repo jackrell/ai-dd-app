@@ -1,10 +1,6 @@
 import { Embeddings } from '@langchain/core/embeddings';
 import { loadPineconeStore } from './pinecone';
-// import { loadMongoDBStore } from './mongo';
 import { Callbacks } from '@langchain/core/callbacks/manager';
-
-
-// need to figure out what chatId does
 
 export async function loadVectorStore({
   namespace,
@@ -20,10 +16,6 @@ export async function loadVectorStore({
       namespace,
       embeddings,
     });
-  // } else if (vectorStoreEnv === 'mongodb') {
-  //   return await loadMongoDBStore({
-  //     embeddings,
-  //   });
   } else {
     throw new Error(`Invalid vector store id provided: ${vectorStoreEnv}`);
   }
@@ -33,10 +25,12 @@ export async function loadRetriever({
   namespace,
   embeddings,
   callbacks,
+  topK = 8, // Default if not specified
 }: {
   namespace: string;
   embeddings: Embeddings;
   callbacks?: Callbacks;
+  topK?: number;
 }) {
   const store = await loadVectorStore({
     namespace,
@@ -58,6 +52,7 @@ export async function loadRetriever({
   const retriever = vectorstore.asRetriever({
     filter,
     callbacks,
+    k: topK, // Set the topK value
   });
 
   return {
