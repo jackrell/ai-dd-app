@@ -101,7 +101,11 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
       router.push(`/folder/${folderName}`);
 
     } catch (error) {
-      console.error('Error during ingestion:', error);
+      if (error instanceof Error) {
+        console.error(`Ingestion handling error: ${error.message}`);
+      } else {
+        console.error(`Unexpected error: ${error}`);
+      }
       setLoading(false);
     }
   }

@@ -131,7 +131,11 @@ export async function POST(request: Request) {
       results.push({ success: true, fileName, id: doc.id });
 
     } catch (error) {
-      console.error(`Error processing file ${fileName}:`, error);
+      if (error instanceof Error) {
+        console.error(`Ingestion error: ${error.message}`);
+      } else {
+        console.error(`Unexpected error: ${error}`);
+      }
       results.push({ success: false, fileName, error: 'Failed to ingest your data' });
     }
   }

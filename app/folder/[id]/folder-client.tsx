@@ -72,9 +72,14 @@ export default function FolderClient({ folderName, documents, userImage }: { fol
         }
 
         reader.releaseLock();
-      } catch (e) {
-        setError(e.message);
-        console.error('Error while reading stream:', e);
+        
+      } catch (error) {
+        if (error instanceof Error){
+          console.error(`Error while reading stream: ${error}`);
+        } else {
+          console.error(`Unexpected error: ${error}`);
+        }
+      
         return;
       }
 
