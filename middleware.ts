@@ -5,10 +5,20 @@ const isProtectedRoute = createRouteMatcher([
   '/folder(.*)',
 ]);
 
-export default clerkMiddleware((auth, req) => {
-  if (isProtectedRoute(req)) {
-    auth().protect();
-  }
+export default clerkMiddleware({
+  secretKey: process.env.CLERK_SECRET_KEY,
+  async onAuth(req, res, next) {
+    if (isProtectedRoute(req)) {
+      try {
+        await req.auth.verify();
+        next();
+      } catch (err) {
+        res.status(401).send('Unauthorized');
+      }
+    } else {
+      next();
+    }
+  },
 });
 
 export const config = {
