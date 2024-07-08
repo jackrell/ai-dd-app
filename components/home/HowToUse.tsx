@@ -17,7 +17,7 @@ export default function HowToUse() {
             <Image src="/upload-icon.png" alt="Upload Icon" width={64} height={64} />
             <h3 className="text-xl font-semibold mt-4">1. Upload Your Documents</h3>
             <p className="text-center mt-2">
-              Click on the "Upload" button and select the documents you want to upload. You can upload multiple PDF files at once.
+              Click on the &quot;Upload&quot; button and select the documents you want to upload. You can upload multiple PDF files at once.
             </p>
           </div>
 
