@@ -9,22 +9,19 @@ const Header = () => {
 
   return (
     <>
-      <div className="container hidden sm:flex bg-white w-full px-5 h-[78px] justify-between items-center border shadow-[0px_1px_4px_0px_rgba(0,0,0,0.25)] rounded-[30px] border-solid border-[rgba(0,0,0,0.17)] mx-auto">
-        <Link href="/" className="flex items-center">
+      <div className="container hidden sm:flex bg-white w-full px-5 h-[78px] justify-between items-center border shadow-[0px_2px_4px_0px_rgba(0,0,0,0.25)] rounded-[30px] border-solid border-[rgba(0,0,0,0.17)] mx-auto">
+        <Link href="/" className="flex items-center" passHref>
           <Logo />
         </Link>
         <div className="sm:flex gap-4 items-center">
-          <Link
-            href="/sign-in"
-            className="text-primary py-1.5 px-[22px] text-center text-xl font-normal border rounded-[18px] border-solid border-primary "
-          >
+          <Link href="/sign-in" className="text-primary py-1.5 px-[22px] text-center text-xl font-normal border rounded-[18px] border-solid border-primary">
             Log in
           </Link>
         </div>
       </div>
 
       <div className="sm:hidden bg-white shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] border-b-[0.5px] h-[54px] flex justify-between items-center px-6 border-b-white border-solid">
-        <Link href="/" className="flex items-center">
+        <Link href="/" className="flex items-center" passHref>
           <Logo isMobile={true} />
           <span className="text-xl font-bold ml-2">Dataroom Chat</span>
         </Link>
@@ -41,10 +38,7 @@ const Header = () => {
       </div>
       {open && (
         <div className="flex sm:hidden gap-4 items-center py-3 bg-white shadow px-5">
-          <Link
-            href="/sign-in"
-            className="text-primary py-1 px-[22px] text-center text-lg font-normal border rounded-[18px] border-solid border-primary "
-          >
+          <Link href="/sign-in" className="text-primary py-1 px-[22px] text-center text-lg font-normal border rounded-[18px] border-solid border-primary">
             Log in
           </Link>
         </div>

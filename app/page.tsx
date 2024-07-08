@@ -14,7 +14,9 @@ export default async function Home() {
 
   return (
     <main className="sm:p-7 sm:pb-0">
-      <Header />
+      <div className="mb-6">
+        <Header />
+      </div>
       <HowToUse />
     </main>
   );

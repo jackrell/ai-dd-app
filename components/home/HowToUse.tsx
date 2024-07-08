@@ -37,12 +37,6 @@ export default function HowToUse() {
             </p>
           </div>
         </div>
-
-        {/* <div className="mt-12">
-          <Link href="/dashboard">
-            <a className="text-lg font-semibold text-blue-600 hover:underline">Go to Dashboard</a>
-          </Link>
-        </div> */}
       </div>
     </div>
   );
