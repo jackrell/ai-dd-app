@@ -9,10 +9,9 @@ import { useAuth } from '@clerk/nextjs';
 import LoadingDots from '@/components/ui/LoadingDots';
 
 
-// Configuration for the uploader
+// Configuration for the uploader (NEED TO FIND WAY TO DISABLE AUTO UPLOAD)
 const uploader = Uploader({
   apiKey: process.env.NEXT_PUBLIC_BYTESCALE_API_KEY || 'no api key found',
-  options: { autoUpload: false }, // Disable automatic upload         (DOESN'T WORK)
 });
 
 export default function DashboardClient({ foldersList }: { foldersList: any }) {
