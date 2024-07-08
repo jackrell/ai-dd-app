@@ -25,7 +25,7 @@ export async function loadRetriever({
   namespace,
   embeddings,
   callbacks,
-  topK = 8, // Default if not specified
+  topK = 5, // Default if not specified
 }: {
   namespace: string;
   embeddings: Embeddings;

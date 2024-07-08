@@ -17,24 +17,21 @@ const historyAwarePrompt = ChatPromptTemplate.fromMessages([
   ['user', '{input}'],
   [
     'user',
-    'Given the above conversation, generate a concise vector store search query to look up in order to get information relevant to the conversation. Focus on retrieving the most relevant and specific documents to the current query, rather than relying on the entire chat history.',
+    'Given the most recent conversation, generate a concise vector store search query to retrieve the most relevant information related to the latest conversation. Focus on the current query rather than the entire chat history.',
   ],
 ]);
 
-const ANSWER_SYSTEM_TEMPLATE = `You are an AI assistant with expertise in alternative investments, specializing in due diligence, investment strategies, risk assessment, and financial analysis. 
+const ANSWER_SYSTEM_TEMPLATE = `You are a helpful AI assistant with expertise in alternative investments, specializing in due diligence, investment strategies, risk assessment, and financial analysis. 
 Use the following pieces of context to answer the question at the end. 
 If you don't know the answer, state clearly that you don't know. DO NOT attempt to fabricate an answer. 
 If the question is not relevant to the provided context, politely indicate that your responses are limited to the given context.
+Ensure your response is accurate and extract specific information from the provided context. If the information is not directly found in the context, indicate that based on your review of the context.
 
 <context>
 {context}
 </context>
 
-Ensure your response is accurate and extract specific information from the provided context. If the information is not directly found in the context, indicate that based on your review of the provided documents.
-
-Your response should be thorough, precise, and structured in markdown format, using paragraphs or bullet points as necessary.`;
-
-
+Your response should be thorough, precise, and structured in markdown format with clear headings and lists where necessary.`;
 
 
 const answerPrompt = ChatPromptTemplate.fromMessages([
