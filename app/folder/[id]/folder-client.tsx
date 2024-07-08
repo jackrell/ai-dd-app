@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { React, useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import LoadingDots from '@/components/ui/LoadingDots';
@@ -141,7 +141,7 @@ export default function FolderClient({ folderName, documents, userImage }: { fol
 
   const pdfUrl = selectedDocument?.fileUrl;
 
-  const handleEnter = (e: any) => {
+  const handleEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && input.trim()) {
       e.preventDefault();
       setMessages((prevMessages) => [...prevMessages, { role: 'user', content: input }, { role: 'assistant', content: '' }]);
@@ -151,7 +151,7 @@ export default function FolderClient({ folderName, documents, userImage }: { fol
     }
   };
 
-  const handleSubmitForm = async (e) => {
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessages((prevMessages) => [...prevMessages, { role: 'user', content: input }, { role: 'assistant', content: '' }]);
     handleSubmit(e);
