@@ -67,6 +67,9 @@ export async function POST(request: Request) {
       console.log(`Created document record for: ${fileName}`);
 
       const response = await fetchWithRetry(fileUrl, { method: 'GET' }, 5, 5000);
+      if (!response) {
+        throw new Error('No response received from fetch');
+      }
 
       // langchain pdf-loader method
       const arrayBuffer = await response.arrayBuffer();
