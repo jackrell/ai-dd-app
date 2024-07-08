@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { UserButton } from '@clerk/nextjs';
-import { User, currentUser } from '@clerk/nextjs/server';
+import { currentUser } from '@clerk/nextjs/server';
 import Image from 'next/image';
 
 export default async function Header() {
-  const user: User | null = await currentUser();
+  const user = await currentUser();
   const isLoggedIn = !!user;
 
   return (

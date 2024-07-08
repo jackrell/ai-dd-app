@@ -1,10 +1,9 @@
 import prisma from '@/utils/prisma';
 import { currentUser } from '@clerk/nextjs/server';
-import type { User } from '@clerk/nextjs/api';
 import FolderClient from './folder-client';
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const user: User | null = await currentUser();
+  const user = await currentUser();
 
   const documents = await prisma.document.findMany({
     where: {
