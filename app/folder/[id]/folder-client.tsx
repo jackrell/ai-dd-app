@@ -27,34 +27,9 @@ export default function FolderClient({ folderName, documents, userImage }: { fol
   const toolbarPluginInstance = toolbarPlugin();
   const pageNavigationPluginInstance = pageNavigationPlugin();
   const { renderDefaultToolbar, Toolbar } = toolbarPluginInstance;
-
-  useEffect(() => {
-    if (isLoaded && !isSignedIn) {
-      router.push('/sign-in');
-    }
-  }, [isLoaded, isSignedIn, router]);
-
-  if (!isLoaded || !isSignedIn) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <LoadingDots color="#000" />
-      </div>
-    );
-  }
-
-  const transform: TransformToolbarSlot = (slot: ToolbarSlot) => ({
-    ...slot,
-    Download: () => <></>,
-    SwitchTheme: () => <></>,
-    Open: () => <></>,
-  });
-
-  const pdfUrl = selectedDocument?.fileUrl;
-
   const [sourcesForMessages, setSourcesForMessages] = useState<Record<number, any[]>>({});
   const [error, setError] = useState('');
   const [chatOnlyView, setChatOnlyView] = useState(false);
-
   const [messages, setMessages] = useState<any[]>([]);
   const { input, handleInputChange, handleSubmit, isLoading } = useChat({
     api: '/api/chat',
@@ -129,8 +104,31 @@ export default function FolderClient({ folderName, documents, userImage }: { fol
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.push('/sign-in');
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  useEffect(() => {
     textAreaRef.current?.focus();
   }, []);
+
+  if (!isLoaded || !isSignedIn) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LoadingDots color="#000" />
+      </div>
+    );
+  }
+
+  const transform: TransformToolbarSlot = (slot: ToolbarSlot) => ({
+    ...slot,
+    Download: () => <></>,
+    SwitchTheme: () => <></>,
+    Open: () => <></>,
+  });
+
+  const pdfUrl = selectedDocument?.fileUrl;
 
   const handleEnter = (e: any) => {
     if (e.key === 'Enter' && input.trim()) {
