@@ -16,7 +16,11 @@ async function fetchWithRetry(url: string, options: any, retries = 5, delay = 50
       if (!response.ok) throw new Error('Network response was not ok');
       return response;
     } catch (error) {
-      console.error(`Fetch error: ${error.message}`);
+      if (error instanceof Error) {
+        console.error(`Fetch error: ${error.message}`);
+      } else {
+        console.error(`Unexpected error: ${error}`);
+      }
       if (i < retries - 1) {
         console.warn(`Fetch failed, retrying in ${delay}ms... (${i + 1}/${retries})`);
         await new Promise((resolve) => setTimeout(resolve, delay));
