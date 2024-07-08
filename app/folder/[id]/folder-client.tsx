@@ -141,7 +141,7 @@ export default function FolderClient({ folderName, documents, userImage }: { fol
 
   const pdfUrl = selectedDocument?.fileUrl;
 
-  const handleEnter = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleEnter = (e: any) => {
     if (e.key === 'Enter' && input.trim()) {
       e.preventDefault();
       setMessages((prevMessages) => [...prevMessages, { role: 'user', content: input }, { role: 'assistant', content: '' }]);
