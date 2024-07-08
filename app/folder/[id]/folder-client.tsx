@@ -20,10 +20,12 @@ import 'katex/dist/katex.min.css'; // Import KaTeX CSS
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 
-export default function FolderClient({ folderName, documents, userImage }: { folderName: string; documents: Document[]; userImage?: string }) {
+import prisma from '@/utils/prisma';
+
+export default function FolderClient({ folderName, documents, userImage }: { folderName: string; documents: prisma.Document[]; userImage?: string }) {
   const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(documents[0]);
+  const [selectedDocument, setSelectedDocument] = useState<prisma.Document | null>(documents[0]);
   const toolbarPluginInstance = toolbarPlugin();
   const pageNavigationPluginInstance = pageNavigationPlugin();
   const { renderDefaultToolbar, Toolbar } = toolbarPluginInstance;
@@ -72,7 +74,7 @@ export default function FolderClient({ folderName, documents, userImage }: { fol
         }
 
         reader.releaseLock();
-        
+
       } catch (error) {
         if (error instanceof Error){
           console.error(`Error while reading stream: ${error}`);
