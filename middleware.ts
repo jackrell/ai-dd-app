@@ -1,9 +1,15 @@
 import { clerkMiddleware } from '@clerk/nextjs/server';
 
-export default clerkMiddleware()
+// console.log("Clerk Secret Key:", process.env.CLERK_SECRET_KEY); // debug
+
+export default clerkMiddleware({
+  secretKey: process.env.CLERK_SECRET_KEY,
+});
 
 export const config = {
-  // The following matcher runs middleware on all routes
-  // except static assets.
-  matcher: [ '/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
+  matcher: [
+    '/((?!.*\\..*|_next).*)',
+    '/',
+    '/(api|trpc)(.*)',
+  ],
 };
