@@ -36,7 +36,7 @@ export default function DashboardClient({ foldersList }: { foldersList: any }) {
   }
 
   const options = {
-    maxFileCount: 15, // Allow multiple files
+    maxFileCount: 30, // Allow multiple files
     mimeTypes: ['application/pdf'],
     editor: { images: { crop: false } },
     styles: {

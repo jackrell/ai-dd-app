@@ -77,26 +77,6 @@ export async function POST(request: Request) {
       const loader = new PDFLoader(blob);
       const rawDocs = await loader.load();
 
-      // // pdf-parse method
-      // const arrayBuffer = await response.arrayBuffer();
-      // const buffer = Buffer.from(arrayBuffer);
-      // const pdfData = await pdfParse(buffer);
-      // const rawDocs = [{ pageContent: pdfData.text }];
-
-      // // web loader method 
-      // const arrayBuffer = await response.arrayBuffer();
-      // const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
-      // const loader = new WebPDFLoader(blob, {
-      //   // you may need to add `.then(m => m.default)` to the end of the import
-      //   pdfjs: () => import('pdfjs-dist/build/pdf').then(m => m.default),
-      // });
-      // const rawDocs = await loader.load();
-
-      // // pdf-parse method 2
-      // const arrayBuffer = await response.arrayBuffer();
-      // const buffer = Buffer.from(arrayBuffer);
-      // const data = await pdf(buffer);
-
       console.log(`Loaded PDF: ${fileName}`);
 
       const textSplitter = new RecursiveCharacterTextSplitter({
