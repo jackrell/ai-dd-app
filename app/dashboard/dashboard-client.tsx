@@ -9,7 +9,7 @@ import { useAuth } from '@clerk/nextjs';
 import LoadingDots from '@/components/ui/LoadingDots';
 
 
-// Configuration for the uploader (NEED TO FIND WAY TO DISABLE AUTO UPLOAD)
+// Configuration for the uploader (BYTESCALE AUTO-UPLOAD)
 const uploader = Uploader({
   apiKey: process.env.NEXT_PUBLIC_BYTESCALE_API_KEY || 'no api key found',
 });
