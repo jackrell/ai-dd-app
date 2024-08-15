@@ -11,8 +11,6 @@ const archivo = Archivo({
 })
 
 
-
-
 export const metadata: Metadata = {
   title: "Dataroom Chat Service",
   description: "Built on Next.js, based on PDF to Chat by Hassan El Mghari",

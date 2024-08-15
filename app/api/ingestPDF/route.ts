@@ -105,7 +105,7 @@ export async function POST(request: Request) {
       // embed the PDF documents
       for (const splitDoc of splitDocs) {
         await vectorstore.addDocuments([splitDoc]);
-        await delay(1000);                                // 1-second delay between each embedding query
+        // await delay(1000);                                // 1-second delay between each embedding query
       }
 
       results.push({ success: true, fileName, id: doc.id });
